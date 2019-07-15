@@ -98,4 +98,77 @@ describe("makeRefObj", () => {
   });
 });
 
-describe("formatComments", () => {});
+describe("formatComments", () => {
+  it("should return an empty array when passed an empty array", () => {
+    expect(formatComments([])).to.eql([]);
+  });
+  it("should return a correctly formatted comment when passed one comment", () => {
+    const inputArray = [
+      {
+        body:
+          "Itaque quisquam est similique et est perspiciatis reprehenderit voluptatem autem. Voluptatem accusantium eius error adipisci quibusdam doloribus.",
+        belongs_to:
+          "The People Tracking Every Touch, Pass And Tackle in the World Cup",
+        created_by: "tickle122",
+        votes: -1,
+        created_at: 1468087638932
+      }
+    ];
+    const inputObj = { tickle122: 1 };
+    const result = formatComments(inputArray, inputObj);
+    const expected = [
+      {
+        body:
+          "Itaque quisquam est similique et est perspiciatis reprehenderit voluptatem autem. Voluptatem accusantium eius error adipisci quibusdam doloribus.",
+        article_id: 1,
+        author: "tickle122",
+        votes: -1,
+        created_at: new Date(1468087638932)
+      }
+    ];
+    expect(result).to.eql(expected);
+  });
+  it("should return a correctly formatted array when passed multiple objects", () => {
+    const inputArray = [
+      {
+        body:
+          "Itaque quisquam est similique et est perspiciatis reprehenderit voluptatem autem. Voluptatem accusantium eius error adipisci quibusdam doloribus.",
+        belongs_to:
+          "The People Tracking Every Touch, Pass And Tackle in the World Cup",
+        created_by: "tickle122",
+        votes: -1,
+        created_at: 1468087638932
+      },
+      {
+        body: "Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.",
+        belongs_to: "Making sense of Redux",
+        created_by: "grumpy19",
+        votes: 7,
+        created_at: 1478813209256
+      }
+    ];
+    const inputObj = {
+      tickle122: 1,
+      grumpy19: 2
+    };
+    const result = formatComments(inputArray, inputObj);
+    const expected = [
+      {
+        body:
+          "Itaque quisquam est similique et est perspiciatis reprehenderit voluptatem autem. Voluptatem accusantium eius error adipisci quibusdam doloribus.",
+        article_id: 1,
+        author: "tickle122",
+        votes: -1,
+        created_at: new Date(1468087638932)
+      },
+      {
+        body: "Nobis consequatur animi. Ullam nobis quaerat voluptates veniam.",
+        article_id: 2,
+        author: "grumpy19",
+        votes: 7,
+        created_at: new Date(1478813209256)
+      }
+    ];
+    expect(result).to.eql(expected);
+  });
+});
