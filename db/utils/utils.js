@@ -1,7 +1,4 @@
 exports.formatDates = list => {
-  // take an array of objects and return an array of items with their timestamp converted into a js date object
-  // sounds like a job for .map() to me.
-
   list.forEach(object => {
     object.created_at = new Date(object.created_at);
   });
@@ -12,6 +9,11 @@ exports.makeRefObj = list => {
   // should take an array and return a ref object keyed with each items title and the values being the ids.
   // eg. will take an object like {article_id: 1, title: 'a'} and will return as {a: 1}
   // again, sounds like a map
+  const objToReturn = {};
+  list.forEach(article => {
+    objToReturn[article.title] = article.article_id;
+  });
+  return objToReturn;
 };
 
 exports.formatComments = (comments, articleRef) => {

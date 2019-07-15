@@ -74,6 +74,28 @@ describe("formatDates", () => {
   });
 });
 
-describe("makeRefObj", () => {});
+describe("makeRefObj", () => {
+  it("should return an empty object when passed an empty array", () => {
+    const input = [];
+    const result = makeRefObj(input);
+    const expected = {};
+    expect(result).to.eql(expected);
+  });
+  it("should return an object with a key of the given article title and a value of the given article id", () => {
+    const input = [{ article_id: 1, title: "banana" }];
+    const result = makeRefObj(input);
+    const expected = { banana: 1 };
+    expect(result).to.eql(expected);
+  });
+  it("should create a reference object when given an array with multiple objects", () => {
+    const input = [
+      { article_id: 1, title: "banana" },
+      { article_id: 86, title: "grape" }
+    ];
+    const result = makeRefObj(input);
+    const expected = { banana: 1, grape: 86 };
+    expect(result).to.eql(expected);
+  });
+});
 
 describe("formatComments", () => {});
