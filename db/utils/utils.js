@@ -1,14 +1,12 @@
 exports.formatDates = list => {
-  list.forEach(object => {
+  const listCopy = list;
+  listCopy.forEach(object => {
     object.created_at = new Date(object.created_at);
   });
-  return list;
+  return listCopy;
 };
 
 exports.makeRefObj = list => {
-  // should take an array and return a ref object keyed with each items title and the values being the ids.
-  // eg. will take an object like {article_id: 1, title: 'a'} and will return as {a: 1}
-  // again, sounds like a map
   const objToReturn = {};
   list.forEach(article => {
     objToReturn[article.title] = article.article_id;
@@ -23,4 +21,11 @@ exports.formatComments = (comments, articleRef) => {
   // The value of the new article_id key must be the id corresponding to the original title value provided
   // Its created_at value converted into a javascript date object
   // The rest of the comment's properties must be maintained
+  const commentsCopy = comments;
+  commentsCopy.forEach(comment => {
+    comment.author = comment.created_by;
+    delete comment.created_by;
+    comment.
+  });
+
 };
