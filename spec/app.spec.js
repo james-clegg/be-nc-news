@@ -24,5 +24,39 @@ describe("/api", () => {
           expect(topics[0]).to.have.all.keys("slug", "description");
         });
     });
+    it("GET ERROR returns a 404 and error message when given an incorrect route", () => {
+      return request(app)
+        .get("/api/banana")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal("route does not exist");
+        });
+    });
+  });
+  describe("/users/:username", () => {
+    it("GET should return a user object", () => {
+      return request(app)
+        .get("/api/users/butter_bridge")
+        .expect(200)
+        .then(({ body: user }) => {
+          expect(user).to.be.an("object");
+        });
+    });
+    it("GET should return a user object with keys of username, avatar_url, and name", () => {
+      return request(app)
+        .get("/api/users/butter_bridge")
+        .expect(200)
+        .then(({ body: user }) => {
+          expect(user).to.have.all.keys("username", "avatar_url", "name");
+        });
+    });
+    it("GET ERROR should return a 404 when passed a username that does not exist", () => {
+      return request(app)
+        .get("/api/users/NOT_A_USER")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.equal("route does not exist");
+        });
+    });
   });
 });

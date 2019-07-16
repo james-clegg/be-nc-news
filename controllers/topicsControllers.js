@@ -5,7 +5,7 @@ const sendAllTopics = (req, res, next) => {
     .then(topicsArray => {
       res.status(200).send({ topics: topicsArray });
     })
-    .catch(console.log);
+    .catch(next);
 };
 
 module.exports = sendAllTopics;
