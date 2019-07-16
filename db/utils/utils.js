@@ -1,9 +1,9 @@
 exports.formatDates = list => {
   const listCopy = [...list];
-  listCopy.forEach(object => {
-    object.created_at = new Date(object.created_at);
+  return listCopy.map(({ created_at, ...restOfObject }) => {
+    created_at = new Date(created_at);
+    return { created_at, ...restOfObject };
   });
-  return listCopy;
 };
 
 exports.makeRefObj = list => {
@@ -17,12 +17,15 @@ exports.makeRefObj = list => {
 exports.formatComments = (comments, articleRef) => {
   if (comments.length === 0) return [];
   const commentsCopy = [...comments];
-  commentsCopy.forEach(comment => {
-    comment.author = comment.created_by;
-    delete comment.created_by;
-    comment.article_id = articleRef[comment.author];
-    delete comment.belongs_to;
-  });
-  this.formatDates(commentsCopy);
-  return commentsCopy;
+
+  return commentsCopy.map(
+    ({ created_by, belongs_to, created_at, ...comment }) => {
+      comment.author = created_by;
+      delete created_by;
+      comment.article_id = articleRef[comment.author];
+      delete belongs_to;
+      created_at = new Date(created_at);
+      return { created_at, ...comment };
+    }
+  );
 };

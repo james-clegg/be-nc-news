@@ -72,6 +72,30 @@ describe("formatDates", () => {
     expect(result[0].created_at instanceof Date).to.be.true;
     expect(result[1].created_at instanceof Date).to.be.true;
   });
+  it("shouldn't mutate the original input", () => {
+    const input = [
+      {
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: 1542284514171,
+        votes: 100
+      }
+    ];
+    const control = [
+      {
+        title: "Living in the shadow of a great man",
+        topic: "mitch",
+        author: "butter_bridge",
+        body: "I find this existence challenging",
+        created_at: 1542284514171,
+        votes: 100
+      }
+    ];
+    formatDates(input);
+    expect(input).to.eql(control);
+  });
 });
 
 describe("makeRefObj", () => {
@@ -82,7 +106,7 @@ describe("makeRefObj", () => {
     expect(result).to.eql(expected);
   });
   it("should return an object with a key of the given article title and a value of the given article id", () => {
-    const input = [{ article_id: 1, title: "banana" }];
+    const input = [{ article_id: 1, title: "banana"}];
     const result = makeRefObj(input);
     const expected = { banana: 1 };
     expect(result).to.eql(expected);
@@ -95,6 +119,12 @@ describe("makeRefObj", () => {
     const result = makeRefObj(input);
     const expected = { banana: 1, grape: 86 };
     expect(result).to.eql(expected);
+  });
+  it("shouldn't mutate the original input", () => {
+    const input = [{ article_id: 1, title: "banana" }];
+    const control = [{ article_id: 1, title: "banana" }];
+    makeRefObj(input);
+    expect(input).to.eql(control);
   });
 });
 
@@ -170,5 +200,34 @@ describe("formatComments", () => {
       }
     ];
     expect(result).to.eql(expected);
+  });
+  it("shouldn't mutate the original input", () => {
+    const inputArray = [
+      {
+        body:
+          "Itaque quisquam est similique et est perspiciatis reprehenderit voluptatem autem. Voluptatem accusantium eius error adipisci quibusdam doloribus.",
+        belongs_to:
+          "The People Tracking Every Touch, Pass And Tackle in the World Cup",
+        created_by: "tickle122",
+        votes: -1,
+        created_at: 1468087638932
+      }
+    ];
+    const control = [
+      {
+        body:
+          "Itaque quisquam est similique et est perspiciatis reprehenderit voluptatem autem. Voluptatem accusantium eius error adipisci quibusdam doloribus.",
+        belongs_to:
+          "The People Tracking Every Touch, Pass And Tackle in the World Cup",
+        created_by: "tickle122",
+        votes: -1,
+        created_at: 1468087638932
+      }
+    ];
+    const inputObj = {
+      tickle122: 1
+    };
+    formatComments(inputArray, inputObj);
+    expect(inputArray).to.eql(control);
   });
 });
