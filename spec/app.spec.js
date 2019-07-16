@@ -12,8 +12,16 @@ describe("/api", () => {
       return request(app)
         .get("/api/topics")
         .expect(200)
-        .then(({ body: {topics} }) => {
+        .then(({ body: { topics } }) => {
           expect(topics).to.be.an("array");
+        });
+    });
+    it("GET returns an object with an array of objects with keys of 'description' and 'slug'", () => {
+      return request(app)
+        .get("/api/topics")
+        .expect(200)
+        .then(({ body: { topics } }) => {
+          expect(topics[0]).to.have.all.keys("slug", "description");
         });
     });
   });
