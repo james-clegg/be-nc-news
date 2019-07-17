@@ -59,10 +59,14 @@ describe("/api", () => {
         });
     });
   });
-  describe('/articles/:article_id', () => {
-    it('GET should return an article object', () => {
+  describe("/articles/:article_id", () => {
+    it("GET should return an article object", () => {
       return request(app)
-      .get('/api/articles/')
+        .get("/api/articles/1")
+        .expect(200)
+        .then(({ body: article }) => {
+          expect(article).to.be.an("object");
+        });
     });
   });
 });
