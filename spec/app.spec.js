@@ -55,8 +55,14 @@ describe("/api", () => {
         .get("/api/users/NOT_A_USER")
         .expect(404)
         .then(({ body: { msg } }) => {
-          expect(msg).to.equal("route does not exist");
+          expect(msg).to.equal("No user found for username: NOT_A_USER");
         });
+    });
+  });
+  describe('/articles/:article_id', () => {
+    it('GET should return an article object', () => {
+      return request(app)
+      .get('/api/articles/')
     });
   });
 });

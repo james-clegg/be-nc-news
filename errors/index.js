@@ -1,3 +1,7 @@
+const handleNonExistentRoutes = (req, res, next) => {
+  res.status(404).send({ msg: "route does not exist" });
+};
+
 const handleCustomErrors = (err, req, res, next) => {
   if (err.status) res.status(err.status).send({ msg: err.msg });
   else next(err);
@@ -11,7 +15,13 @@ const handlePsqlErrors = (err, req, res, next) => {
 };
 
 const handleServerErrors = (err, req, res, next) => {
+  console.log(err);
   res.status(500).send({ msg: "Internal server error" });
 };
 
-module.exports = { handleCustomErrors, handlePsqlErrors, handleServerErrors };
+module.exports = {
+  handleNonExistentRoutes,
+  handleCustomErrors,
+  handlePsqlErrors,
+  handleServerErrors
+};

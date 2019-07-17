@@ -4,7 +4,7 @@ const sendUserById = (req, res, next) => {
   const { username } = req.params;
   selectUserById(username)
     .then(user => {
-      if (!user) {
+      if (!user.length) {
         return Promise.reject({
           status: 404,
           msg: `No user found for username: ${username}`
