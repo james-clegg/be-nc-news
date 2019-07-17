@@ -101,5 +101,13 @@ describe("/api", () => {
           expect(msg).eql("Invalid input syntax");
         });
     });
+    it('PATCH returns 201 and the updated article', () => {
+      return request(app)
+      .patch('/api/articles/1')
+      .send({inc_votes: 1})
+      .then(({body: {msg}}) => {
+
+      })
+    });
   });
 });

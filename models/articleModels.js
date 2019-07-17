@@ -18,4 +18,9 @@ const selectArticleById = article_id => {
     .groupBy("articles.article_id");
 };
 
-module.exports = selectArticleById;
+const updateVotesOnArticleById = (article_id, inc_votes) => {
+  return connection
+    
+}
+
+module.exports = {selectArticleById, updateVotesOnArticleById};
