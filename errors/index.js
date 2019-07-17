@@ -8,9 +8,9 @@ const handleCustomErrors = (err, req, res, next) => {
 };
 
 const handlePsqlErrors = (err, req, res, next) => {
-  const psqlBadRequestCodes = ["22P02"];
-  if (psqlBadRequestCodes.includes(err.code))
-    res.status(400).send({ msg: err.message || "Bad Request" });
+  const psqlBadRequestCodes = {'22P02': 'Invalid input syntax'};
+  if (psqlBadRequestCodes[err.code])
+    res.status(400).send({ msg: psqlBadRequestCodes[err.code] || "Bad Request" });
   else next(err);
 };
 

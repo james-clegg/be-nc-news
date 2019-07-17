@@ -4,7 +4,6 @@ const selectAllTopics = () => {
   return connection
     .select("*")
     .from("topics")
-    .returning("*");
 };
 
 module.exports = selectAllTopics;

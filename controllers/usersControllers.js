@@ -5,12 +5,12 @@ const sendUserById = (req, res, next) => {
   selectUserById(username)
     .then(user => {
       if (!user.length) {
-        return Promise.reject({
+        return next({
           status: 404,
           msg: `No user found for username: ${username}`
         });
       }
-      res.status(200).send(user[0]);
+      res.status(200).send({user: user[0]});
     })
     .catch(next);
 };
