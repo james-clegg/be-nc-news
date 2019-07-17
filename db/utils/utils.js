@@ -22,7 +22,7 @@ exports.formatComments = (comments, articleRef) => {
     ({ created_by, belongs_to, created_at, ...comment }) => {
       comment.author = created_by;
       delete created_by;
-      comment.article_id = articleRef[comment.author];
+      comment.article_id = articleRef[belongs_to];
       delete belongs_to;
       created_at = new Date(created_at);
       return { created_at, ...comment };

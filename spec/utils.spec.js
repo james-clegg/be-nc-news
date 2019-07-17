@@ -144,7 +144,7 @@ describe("formatComments", () => {
         created_at: 1468087638932
       }
     ];
-    const inputObj = { tickle122: 1 };
+    const inputObj = { "The People Tracking Every Touch, Pass And Tackle in the World Cup": 1 };
     const result = formatComments(inputArray, inputObj);
     const expected = [
       {
@@ -178,8 +178,8 @@ describe("formatComments", () => {
       }
     ];
     const inputObj = {
-      tickle122: 1,
-      grumpy19: 2
+      "The People Tracking Every Touch, Pass And Tackle in the World Cup": 1,
+      "Making sense of Redux": 2
     };
     const result = formatComments(inputArray, inputObj);
     const expected = [
