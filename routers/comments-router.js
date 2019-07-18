@@ -1,10 +1,11 @@
 const express = require("express");
 const commentsRouter = express.Router();
-const {updateVotesOnCommentbyCommentId} = require('../controllers/commentsControllers');
+const {updateVotesOnCommentbyCommentId, removeCommentByCommentId} = require('../controllers/commentsControllers');
 
 commentsRouter
 .route('/:comment_id')
 .patch(updateVotesOnCommentbyCommentId)
+.delete(removeCommentByCommentId)
 
 
 

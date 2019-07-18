@@ -36,7 +36,7 @@ const selectAllCommentsByArticleId = (
     });
 };
 
-incrementVotesonCommentByCommentId = (comment_id, inc_votes) => {
+const incrementVotesonCommentByCommentId = (comment_id, inc_votes) => {
   return connection
     .select("*")
     .from("comments")
@@ -45,4 +45,29 @@ incrementVotesonCommentByCommentId = (comment_id, inc_votes) => {
     .returning("*");
 };
 
-module.exports = { insertComment, selectAllCommentsByArticleId };
+const deleteCommentByCommentId = comment_id => {
+  return connection
+    .select("*")
+    .from("comments")
+    .where("comment_id", comment_id)
+    .returning("*")
+    .then(comments => {
+      if (!comments.length) {
+        return Promise.reject({
+          status: 404,
+          msg: "No comments found for comment_id 9999"
+        });
+      } else {
+        return connection("comments")
+          .where("comment_id", comment_id)
+          .del();
+      }
+    });
+};
+
+module.exports = {
+  insertComment,
+  selectAllCommentsByArticleId,
+  incrementVotesonCommentByCommentId,
+  deleteCommentByCommentId
+};

@@ -418,7 +418,7 @@ describe("/api", () => {
         .send({ inc_votes: 1 })
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).eql("Invalid input syntax");
+          expect(msg).to.eql("Invalid input syntax");
         });
     });
     it("PATCH ERROR returns 400 if there is no body on the request", () => {
@@ -426,7 +426,7 @@ describe("/api", () => {
         .patch("/api/comments/1")
         .expect(400)
         .then(({ body: { msg } }) => {
-          expect(msg).eql("No body on request");
+          expect(msg).to.eql("No body on request");
         });
     });
     it("PATCH ERROR returns 400 if the body on the request is in the incorrect format", () => {
@@ -435,7 +435,7 @@ describe("/api", () => {
         .expect(400)
         .send({ inc_votes: "banana" })
         .then(({ body: { msg } }) => {
-          expect(msg).eql("Invalid input syntax");
+          expect(msg).to.eql("Invalid input syntax");
         });
     });
     it("PATCH ERROR returns 400 if the body on the request contains more than just inc_votes", () => {
@@ -444,8 +444,32 @@ describe("/api", () => {
         .expect(400)
         .send({ inc_votes: 1, Shaq: "legend" })
         .then(({ body: { msg } }) => {
-          expect(msg).eql("body contains unexpected keys");
+          expect(msg).to.eql("body contains unexpected keys");
         });
+    });
+    it('DELETE returns 204 and no content', () => {
+      return request(app)
+      .delete('/api/comments/1')
+      .expect(204)
+      .then(({body}) => {
+        expect(body).to.eql({});
+      })
+    });
+    it('DELETE ERROR returns 404 if the comment_id does not exist', () => {
+      return request(app)
+      .delete('/api/comments/9999')
+      .expect(404)
+      .then(({body: {msg}}) => {
+        expect(msg).to.eql('No comments found for comment_id 9999')
+      })
+    });
+    it('DELETE ERROR returns 400 if the comment_id is in the incorrect format', () => {
+      return request(app)
+      .delete('/api/comments/NOT_AN_INTEGER')
+      .expect(400)
+      .then(({body: {msg}}) => {
+        expect(msg).to.eql('Invalid input syntax')
+      })
     });
   });
 });

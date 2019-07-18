@@ -1,6 +1,8 @@
 const {
   insertComment,
-  selectAllCommentsByArticleId
+  selectAllCommentsByArticleId,
+  incrementVotesonCommentByCommentId,
+  deleteCommentByCommentId
 } = require("../models/commentsModels");
 
 const addCommentByArticleId = (req, res, next) => {
@@ -51,8 +53,18 @@ const updateVotesOnCommentbyCommentId = (req, res, next) => {
   }
 };
 
+const removeCommentByCommentId = (req, res, next) => {
+  const { comment_id } = req.params;
+  deleteCommentByCommentId(comment_id)
+    .then(() => {
+      res.status(204).send();
+    })
+    .catch(next);
+};
+
 module.exports = {
   addCommentByArticleId,
   sendAllCommentsByArticleId,
-  updateVotesOnCommentbyCommentId
+  updateVotesOnCommentbyCommentId,
+  removeCommentByCommentId
 };
