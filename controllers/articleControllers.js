@@ -18,7 +18,7 @@ const sendArticleById = (req, res, next) => {
     .catch(next);
 };
 
-const addArticleById = (req, res, next) => {
+const updateVotesByArticleId = (req, res, next) => {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
   const regex = /\D/g;
@@ -43,4 +43,4 @@ const addArticleById = (req, res, next) => {
   }
 };
 
-module.exports = { sendArticleById, addArticleById };
+module.exports = { sendArticleById, updateVotesByArticleId };
