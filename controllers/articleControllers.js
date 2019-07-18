@@ -1,6 +1,7 @@
 const {
   selectArticleById,
-  updateVotesOnArticleById
+  updateVotesOnArticleById,
+  selectAllArticles
 } = require("../models/articleModels.js");
 
 const sendArticleById = (req, res, next) => {
@@ -33,11 +34,24 @@ const updateVotesByArticleId = (req, res, next) => {
             msg: `No article found for article_id: ${article_id}`
           });
         } else {
-          res.status(201).send({ article: article[0] });
+          res.status(200).send({ article: article[0] });
         }
       })
       .catch(next);
   }
 };
 
-module.exports = { sendArticleById, updateVotesByArticleId };
+const sendAllArticles = (req, res, next) => {
+  const { sort_by, order = 'desc', author, topic } = req.query;
+  if (order === "asc" || order === "desc") {
+    selectAllArticles(sort_by, order, author, topic)
+    .then(arrayOfArticles => {
+      res.status(200).send({ articles: arrayOfArticles });
+    })
+    .catch(next);
+  } else {
+    next({ status: 400, msg: "Order is in invalid format" });
+  }
+};
+
+module.exports = { sendArticleById, updateVotesByArticleId, sendAllArticles };

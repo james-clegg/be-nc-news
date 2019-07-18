@@ -103,10 +103,11 @@ describe("/api", () => {
           expect(msg).eql("Invalid input syntax");
         });
     });
-    it("PATCH returns 201 and the updated article", () => {
+    it("PATCH returns 200 and the updated article", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ inc_votes: 1 })
+        .expect(200)
         .then(({ body: { article } }) => {
           expect(article).to.have.all.keys(
             "author",
@@ -123,6 +124,7 @@ describe("/api", () => {
       return request(app)
         .patch("/api/articles/9999")
         .send({ inc_votes: 1 })
+        .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).to.eql("No article found for article_id: 9999");
         });
@@ -131,6 +133,7 @@ describe("/api", () => {
       return request(app)
         .patch("/api/articles/NOT_AN_INTEGER")
         .send({ inc_votes: 1 })
+        .expect(400)
         .then(({ body: { msg } }) => {
           expect(msg).eql("Invalid input syntax");
         });
@@ -138,6 +141,7 @@ describe("/api", () => {
     it("PATCH ERROR returns 400 if there is no body on the request", () => {
       return request(app)
         .patch("/api/articles/1")
+        .expect(400)
         .then(({ body: { msg } }) => {
           expect(msg).eql("No body on request");
         });
@@ -145,6 +149,7 @@ describe("/api", () => {
     it("PATCH ERROR returns 400 if the body on the request is in the incorrect format", () => {
       return request(app)
         .patch("/api/articles/1")
+        .expect(400)
         .send({ inc_votes: "banana" })
         .then(({ body: { msg } }) => {
           expect(msg).eql("Invalid input syntax");
@@ -153,6 +158,7 @@ describe("/api", () => {
     it("PATCH ERROR returns 400 if the body on the request contains more than just inc_votes", () => {
       return request(app)
         .patch("/api/articles/1")
+        .expect(400)
         .send({ inc_votes: 1, Shaq: "legend" })
         .then(({ body: { msg } }) => {
           expect(msg).eql("body contains unexpected keys");
@@ -163,6 +169,7 @@ describe("/api", () => {
     it("POST returns 201 and returns the posted comment object", () => {
       return request(app)
         .post("/api/articles/1/comments")
+        .expect(201)
         .send({
           username: "butter_bridge",
           body: "insert witty catchphrase here"
@@ -181,6 +188,7 @@ describe("/api", () => {
     it("POST ERROR returns 404 if article_id does not exist", () => {
       return request(app)
         .post("/api/articles/9999/comments")
+        .expect(404)
         .send({
           username: "butter_bridge",
           body: "insert witty catchphrase here"
@@ -192,6 +200,7 @@ describe("/api", () => {
     it("POST ERROR returns 400 if article_id was in the incorrect format", () => {
       return request(app)
         .post("/api/articles/NOT_AN_INTEGER/comments")
+        .expect(400)
         .send({
           username: "butter_bridge",
           body: "insert witty catchphrase here"
@@ -203,6 +212,7 @@ describe("/api", () => {
     it("POST ERROR returns 400 if there is no body on the request", () => {
       return request(app)
         .post("/api/articles/1/comments")
+        .expect(400)
         .then(({ body: { msg } }) => {
           expect(msg).eql("No body on request");
         });
@@ -210,6 +220,7 @@ describe("/api", () => {
     it("POST ERROR returns 400 if the body on the request contains more than the necessary keys", () => {
       return request(app)
         .post("/api/articles/1/comments")
+        .expect(400)
         .send({
           username: "butter_bridge",
           body: "insert witty catchphrase here",
@@ -280,6 +291,93 @@ describe("/api", () => {
         .expect(200)
         .then(({ body: { comments } }) => {
           expect(comments).to.be.sortedBy("votes", { descending: false });
+        });
+    });
+  });
+  describe("/api/articles", () => {
+    it("GET returns 200 and an array of article objects with the correct keys", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles[0]).to.have.all.keys(
+            "author",
+            "title",
+            "article_id",
+            "topic",
+            "body",
+            "created_at",
+            "votes",
+            "comment_count"
+          );
+        });
+    });
+    it("GET returns 200 and an array of article objects sorted by a given column and in a given order", () => {
+      return request(app)
+        .get("/api/articles?sort_by=votes&order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.sortedBy("votes", { descending: false });
+        });
+    });
+    it("GET returns 200 and an array of article objects filtered for a specific author", () => {
+      return request(app)
+        .get("/api/articles?author=butter_bridge")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles[0].author).to.eql("butter_bridge");
+        });
+    });
+    it("GET returns 200 and an array of article objects filtered for a specific topic", () => {
+      return request(app)
+        .get("/api/articles?topic=cats")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles[0].topic).to.eql("cats");
+        });
+    });
+    it("GET returns 200 and an array of article objects sorted by votes ascending and filtered for a specific topic and author", () => {
+      return request(app)
+        .get(
+          "/api/articles?topic=mitch&author=butter_bridge&sort_by=votes&order=asc"
+        )
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles[0].topic).to.eql("mitch");
+          expect(articles[0].author).to.eql("butter_bridge");
+          expect(articles).to.be.sortedBy("votes", { descending: false });
+        });
+    });
+    it("GET ERROR returns 400 when passed an invalid sort_by query", () => {
+      return request(app)
+        .get("/api/articles?sort_by=idkI'veWrittenSoMuchCode")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.eql("Column does not exist");
+        });
+    });
+    it("GET ERROR returns 400 when passed an invalid order query", () => {
+      return request(app)
+        .get("/api/articles?order=INeedToCommitMore")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.eql("Order is in invalid format");
+        });
+    });
+    it("GET ERROR returns 400 when passed an author to filter by that returns no articles", () => {
+      return request(app)
+        .get("/api/articles?author=fatboyslim")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.eql("Author is not in the database or does not have any articles associated with them");
+        });
+    });
+    it('GET ERROR returns 400 when passed a topic to filter by that returns no articles', () => {
+      return request(app)
+        .get("/api/articles?topic=fatboyslim")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.eql("Topic is not in the database or does not have any articles associated with it");
         });
     });
   });

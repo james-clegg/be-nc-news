@@ -9,11 +9,14 @@ const handleCustomErrors = (err, req, res, next) => {
 
 const handlePsqlErrors = (err, req, res, next) => {
   const psqlBadRequestCodes = {
-    '22P02': 'Invalid input syntax',
-    '23503': 'Article_id does not exist'
+    "22P02": { status: 400, msg: "Invalid input syntax" },
+    "23503": { status: 404, msg: "Article_id does not exist" },
+    "42703": { status: 400, msg: "Column does not exist" }
   };
   if (psqlBadRequestCodes[err.code])
-    res.status(400).send({ msg: psqlBadRequestCodes[err.code] || "Bad Request" });
+    res
+      .status(psqlBadRequestCodes[err.code].status)
+      .send({ msg: psqlBadRequestCodes[err.code].msg || "Bad Request" });
   else next(err);
 };
 

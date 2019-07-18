@@ -24,7 +24,43 @@ const updateVotesOnArticleById = (article_id, inc_votes) => {
     .from("articles")
     .where("article_id", article_id)
     .increment("votes", inc_votes)
-    .returning('*')
+    .returning("*");
 };
 
-module.exports = { selectArticleById, updateVotesOnArticleById };
+const selectAllArticles = (
+  sort_by = "created_at",
+  order,
+  author,
+  topic
+) => {
+  return connection
+    .select(
+      "articles.author",
+      "articles.title",
+      "articles.article_id",
+      "articles.topic",
+      "articles.body",
+      "articles.created_at",
+      "articles.votes"
+    )
+    .from("articles")
+    .orderBy(sort_by, order)
+    .count("comment_id as comment_count")
+    .join("comments", "articles.article_id", "comments.article_id")
+    .groupBy("articles.article_id")
+    .modify(query => {
+      if (author) query.where({ "articles.author": author });
+      if (topic) query.where({ topic });
+    })
+    .then(articles => {
+      if (!articles.length && author) return Promise.reject({ status: 400, msg: 'Author is not in the database or does not have any articles associated with them'})
+      else if (!articles.length && topic) return Promise.reject({ status: 400, msg: 'Topic is not in the database or does not have any articles associated with it'})
+      else return articles
+    })
+};
+
+module.exports = {
+  selectArticleById,
+  updateVotesOnArticleById,
+  selectAllArticles
+};
