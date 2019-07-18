@@ -1,7 +1,8 @@
-const express = require('express');
+const express = require("express");
 const usersRouter = express.Router();
-const sendUserById = require('../controllers/usersControllers');
+const sendUserById = require("../controllers/usersControllers");
 
-usersRouter.get('/:username', sendUserById);
+//Get request to get a user by their username
+usersRouter.get("/:username", sendUserById);
 
 module.exports = usersRouter;

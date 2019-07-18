@@ -10,6 +10,8 @@ describe("/api", () => {
   after(() => connection.destroy());
   beforeEach(() => connection.seed.run());
   describe("/topics", () => {
+    //Get request to get all topics
+
     it("GET returns an object with a key of 'topics' and a value of an array of all the topics", () => {
       return request(app)
         .get("/api/topics")
@@ -36,6 +38,8 @@ describe("/api", () => {
     });
   });
   describe("/users/:username", () => {
+    //Get request to get a user by their username
+
     it("GET should return a user object", () => {
       return request(app)
         .get("/api/users/butter_bridge")
@@ -62,6 +66,8 @@ describe("/api", () => {
     });
   });
   describe("/articles/:article_id", () => {
+    //Get request to get an article by its ID
+
     it("GET should return an article object", () => {
       return request(app)
         .get("/api/articles/1")
@@ -103,6 +109,9 @@ describe("/api", () => {
           expect(msg).eql("Invalid input syntax");
         });
     });
+
+    //Patch request to update the votes property of a particular article
+
     it("PATCH returns 200 and the updated article", () => {
       return request(app)
         .patch("/api/articles/1")
@@ -166,6 +175,8 @@ describe("/api", () => {
     });
   });
   describe("/api/articles/:article_id/comments", () => {
+    //Post request to post a new comment on a given article
+
     it("POST returns 201 and returns the posted comment object", () => {
       return request(app)
         .post("/api/articles/1/comments")
@@ -230,6 +241,9 @@ describe("/api", () => {
           expect(msg).eql("body contains unexpected keys");
         });
     });
+
+    //Get request to get an array of all the comments for a particular article
+
     it("GET returns 200 and an array of comments for the given article ID", () => {
       return request(app)
         .get("/api/articles/5/comments")
@@ -295,6 +309,8 @@ describe("/api", () => {
     });
   });
   describe("/api/articles", () => {
+    //Get request to get all of the articles
+
     it("GET returns 200 and an array of article objects with the correct keys", () => {
       return request(app)
         .get("/api/articles")
@@ -386,6 +402,8 @@ describe("/api", () => {
     });
   });
   describe("/api/comments/:comment_id", () => {
+    //Patch request to update the votes total of a particular comment
+
     it("PATCH should return 200 and an updated comment object with the new values", () => {
       return request(app)
         .patch("/api/comments/1")
@@ -447,29 +465,32 @@ describe("/api", () => {
           expect(msg).to.eql("body contains unexpected keys");
         });
     });
-    it('DELETE returns 204 and no content', () => {
+
+    //Delete request removes a particular comment by its ID
+
+    it("DELETE returns 204 and no content", () => {
       return request(app)
-      .delete('/api/comments/1')
-      .expect(204)
-      .then(({body}) => {
-        expect(body).to.eql({});
-      })
+        .delete("/api/comments/1")
+        .expect(204)
+        .then(({ body }) => {
+          expect(body).to.eql({});
+        });
     });
-    it('DELETE ERROR returns 404 if the comment_id does not exist', () => {
+    it("DELETE ERROR returns 404 if the comment_id does not exist", () => {
       return request(app)
-      .delete('/api/comments/9999')
-      .expect(404)
-      .then(({body: {msg}}) => {
-        expect(msg).to.eql('No comments found for comment_id 9999')
-      })
+        .delete("/api/comments/9999")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.eql("No comments found for comment_id 9999");
+        });
     });
-    it('DELETE ERROR returns 400 if the comment_id is in the incorrect format', () => {
+    it("DELETE ERROR returns 400 if the comment_id is in the incorrect format", () => {
       return request(app)
-      .delete('/api/comments/NOT_AN_INTEGER')
-      .expect(400)
-      .then(({body: {msg}}) => {
-        expect(msg).to.eql('Invalid input syntax')
-      })
+        .delete("/api/comments/NOT_AN_INTEGER")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.eql("Invalid input syntax");
+        });
     });
   });
 });

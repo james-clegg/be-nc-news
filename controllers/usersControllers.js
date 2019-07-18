@@ -1,5 +1,6 @@
 const selectUserById = require("../models/usersModels");
 
+//Get request to get a user by their username
 const sendUserById = (req, res, next) => {
   const { username } = req.params;
   selectUserById(username)
@@ -10,7 +11,7 @@ const sendUserById = (req, res, next) => {
           msg: `No user found for username: ${username}`
         });
       }
-      res.status(200).send({user: user[0]});
+      res.status(200).send({ user: user[0] });
     })
     .catch(next);
 };
