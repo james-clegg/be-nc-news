@@ -46,7 +46,7 @@ describe("/api", () => {
       return request(app)
         .get("/api/users/butter_bridge")
         .expect(200)
-        .then(({ body: {user} }) => {
+        .then(({ body: { user } }) => {
           expect(user).to.have.all.keys("username", "avatar_url", "name");
         });
     });
@@ -72,7 +72,7 @@ describe("/api", () => {
       return request(app)
         .get("/api/articles/1")
         .expect(200)
-        .then(({ body: {article} }) => {
+        .then(({ body: { article } }) => {
           expect(article).to.have.all.keys(
             "author",
             "title",
@@ -101,13 +101,60 @@ describe("/api", () => {
           expect(msg).eql("Invalid input syntax");
         });
     });
-    it('PATCH returns 201 and the updated article', () => {
+    it("PATCH returns 201 and the updated article", () => {
       return request(app)
-      .patch('/api/articles/1')
-      .send({inc_votes: 1})
-      .then(({body: {msg}}) => {
-
-      })
+        .patch("/api/articles/1")
+        .send({ inc_votes: 1 })
+        .then(({ body: { article } }) => {
+          expect(article).to.have.all.keys(
+            "author",
+            "title",
+            "article_id",
+            "topic",
+            "body",
+            "created_at",
+            "votes"
+          );
+        });
+    });
+    it("PATCH ERROR returns 404 if article_id does not exist", () => {
+      return request(app)
+        .patch("/api/articles/9999")
+        .send({ inc_votes: 1 })
+        .then(({ body: { msg } }) => {
+          expect(msg).to.eql("No article found for article_id: 9999");
+        });
+    });
+    it("PATCH ERROR returns 400 if article_id was in the incorrect format", () => {
+      return request(app)
+        .patch("/api/articles/NOT_AN_INTEGER")
+        .send({ inc_votes: 1 })
+        .then(({ body: { msg } }) => {
+          expect(msg).eql("Invalid input syntax");
+        });
+    });
+    it("PATCH ERROR returns 400 if there is no body on the request", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .then(({ body: { msg } }) => {
+          expect(msg).eql("No body on request");
+        });
+    });
+    it("PATCH ERROR returns 400 if the body on the request is in the incorrect format", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: "banana" })
+        .then(({ body: { msg } }) => {
+          expect(msg).eql("body in invalid format");
+        });
+    });
+    it("PATCH ERROR returns 400 if the body on the request contains more than just inc_votes", () => {
+      return request(app)
+        .patch("/api/articles/1")
+        .send({ inc_votes: 1, Shaq: "legend" })
+        .then(({ body: { msg } }) => {
+          expect(msg).eql("body contains unexpected keys");
+        });
     });
   });
 });
