@@ -160,14 +160,20 @@ describe("/api", () => {
   describe("/api/articles/:article_id/comments", () => {
     it("POST returns 201 and returns the posted comment object", () => {
       return request(app)
-        .post("/api/articles/:article_id/comments")
-        .send({ username: "bigShaq", body: "insert witty catchphrase here" })
+        .post("/api/articles/1/comments")
+        .send({
+          username: "butter_bridge",
+          body: "insert witty catchphrase here"
+        })
         .then(({ body: { comment } }) => {
-          expect(comment).to.eql({
-            comment: [
-              { username: "bigShaq", body: "insert witty catchphrase here" }
-            ]
-          });
+          expect(comment[0]).to.have.all.keys(
+            "article_id",
+            "author",
+            "body",
+            "comment_id",
+            "created_at",
+            "votes"
+          );
         });
     });
   });
