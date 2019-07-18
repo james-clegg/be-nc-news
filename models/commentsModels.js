@@ -6,7 +6,10 @@ const insertComment = (article_id, username, body) => {
     .insert({ article_id: article_id, author: username, body: body });
 };
 
-const selectAllCommentsByArticleId = (article_id, {sort_by = 'created_at', order = 'desc'}) => {
+const selectAllCommentsByArticleId = (
+  article_id,
+  { sort_by = "created_at", order = "desc" }
+) => {
   return connection
     .select("*")
     .from("comments")
@@ -31,6 +34,15 @@ const selectAllCommentsByArticleId = (article_id, {sort_by = 'created_at', order
       }
       return commentsArray;
     });
+};
+
+incrementVotesonCommentByCommentId = (comment_id, inc_votes) => {
+  return connection
+    .select("*")
+    .from("comments")
+    .where("comment_id", comment_id)
+    .increment("votes", inc_votes)
+    .returning("*");
 };
 
 module.exports = { insertComment, selectAllCommentsByArticleId };
