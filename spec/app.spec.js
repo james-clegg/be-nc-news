@@ -1,5 +1,7 @@
 process.env.NODE_ENV = "test";
-const { expect } = require("chai");
+const chai = require("chai");
+const expect = chai.expect;
+chai.use(require("chai-sorted"));
 const request = require("supertest");
 const app = require("../app");
 const connection = require("../db/connection");
@@ -145,7 +147,7 @@ describe("/api", () => {
         .patch("/api/articles/1")
         .send({ inc_votes: "banana" })
         .then(({ body: { msg } }) => {
-          expect(msg).eql("body in invalid format");
+          expect(msg).eql("Invalid input syntax");
         });
     });
     it("PATCH ERROR returns 400 if the body on the request contains more than just inc_votes", () => {
@@ -174,6 +176,110 @@ describe("/api", () => {
             "created_at",
             "votes"
           );
+        });
+    });
+    it("POST ERROR returns 404 if article_id does not exist", () => {
+      return request(app)
+        .post("/api/articles/9999/comments")
+        .send({
+          username: "butter_bridge",
+          body: "insert witty catchphrase here"
+        })
+        .then(({ body: { msg } }) => {
+          expect(msg).to.eql("Article_id does not exist");
+        });
+    });
+    it("POST ERROR returns 400 if article_id was in the incorrect format", () => {
+      return request(app)
+        .post("/api/articles/NOT_AN_INTEGER/comments")
+        .send({
+          username: "butter_bridge",
+          body: "insert witty catchphrase here"
+        })
+        .then(({ body: { msg } }) => {
+          expect(msg).eql("Invalid input syntax");
+        });
+    });
+    it("POST ERROR returns 400 if there is no body on the request", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .then(({ body: { msg } }) => {
+          expect(msg).eql("No body on request");
+        });
+    });
+    it("POST ERROR returns 400 if the body on the request contains more than the necessary keys", () => {
+      return request(app)
+        .post("/api/articles/1/comments")
+        .send({
+          username: "butter_bridge",
+          body: "insert witty catchphrase here",
+          randomKey: "banana"
+        })
+        .then(({ body: { msg } }) => {
+          expect(msg).eql("body contains unexpected keys");
+        });
+    });
+    it("GET returns 200 and an array of comments for the given article ID", () => {
+      return request(app)
+        .get("/api/articles/5/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.be.an("array");
+        });
+    });
+    it("GET returns 200 and an array of comments each with the appropriate keys", () => {
+      return request(app)
+        .get("/api/articles/5/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments[0]).to.have.all.keys(
+            "comment_id",
+            "author",
+            "article_id",
+            "votes",
+            "created_at",
+            "body"
+          );
+        });
+    });
+    it("GET ERROR returns 404 if article id does not exist in the database", () => {
+      return request(app)
+        .get("/api/articles/9999/comments")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).to.eql("No article found for article_id: 9999");
+        });
+    });
+    it("GET ERROR returns 400 if parametric endpoint is in the wrong format", () => {
+      return request(app)
+        .get("/api/articles/NOT_AN_INTEGER/comments")
+        .expect(400)
+        .then(({ body: { msg } }) => {
+          expect(msg).eql("Invalid input syntax");
+        });
+    });
+    it("GET returns 200 and an empty array if the given article does not have any comments", () => {
+      return request(app)
+        .get("/api/articles/2/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.eql([]);
+        });
+    });
+    it("GET returns 200 and an array sorted by created_at if no query is passed", () => {
+      return request(app)
+        .get("/api/articles/5/comments")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.be.sortedBy("created_at", { descending: true });
+        });
+    });
+    it("GET returns 200 and an array sorted by a given variable if passed on as a query", () => {
+      return request(app)
+        .get("/api/articles/5/comments?sort_by=votes&order=asc")
+        .expect(200)
+        .then(({ body: { comments } }) => {
+          expect(comments).to.be.sortedBy("votes", { descending: false });
         });
     });
   });

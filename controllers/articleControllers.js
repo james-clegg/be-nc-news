@@ -21,10 +21,7 @@ const sendArticleById = (req, res, next) => {
 const updateVotesByArticleId = (req, res, next) => {
   const { article_id } = req.params;
   const { inc_votes } = req.body;
-  const regex = /\D/g;
   if (inc_votes === undefined) next({ status: 400, msg: "No body on request" });
-  else if (regex.test(inc_votes))
-    next({ status: 400, msg: "body in invalid format" });
   else if (Object.keys(req.body).length > 1)
     next({ status: 400, msg: "body contains unexpected keys" });
   else {
