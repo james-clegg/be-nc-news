@@ -44,8 +44,8 @@ describe("/api", () => {
       return request(app)
         .get("/api/users/butter_bridge")
         .expect(200)
-        .then(({ body: user }) => {
-          expect(user).to.be.an("object");
+        .then(({ body: { user } }) => {
+          expect(user[0]).to.be.an("object");
         });
     });
     it("GET should return a user object with keys of username, avatar_url, and name", () => {
@@ -53,7 +53,7 @@ describe("/api", () => {
         .get("/api/users/butter_bridge")
         .expect(200)
         .then(({ body: { user } }) => {
-          expect(user).to.have.all.keys("username", "avatar_url", "name");
+          expect(user[0]).to.have.all.keys("username", "avatar_url", "name");
         });
     });
     it("GET ERROR should return a 404 when passed a username that does not exist", () => {
@@ -72,8 +72,8 @@ describe("/api", () => {
       return request(app)
         .get("/api/articles/1")
         .expect(200)
-        .then(({ body: article }) => {
-          expect(article).to.be.an("object");
+        .then(({ body: { article } }) => {
+          expect(article[0]).to.be.an("object");
         });
     });
     it("GET should return an article object with keys of author, title, article_id, body, topic, created_at, votes, and comment_count", () => {
@@ -81,7 +81,7 @@ describe("/api", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body: { article } }) => {
-          expect(article).to.have.all.keys(
+          expect(article[0]).to.have.all.keys(
             "author",
             "title",
             "article_id",
@@ -118,7 +118,7 @@ describe("/api", () => {
         .send({ inc_votes: 1 })
         .expect(200)
         .then(({ body: { article } }) => {
-          expect(article).to.have.all.keys(
+          expect(article[0]).to.have.all.keys(
             "author",
             "title",
             "article_id",

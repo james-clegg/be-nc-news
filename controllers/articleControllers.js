@@ -15,7 +15,7 @@ const sendArticleById = (req, res, next) => {
           msg: `No article found for article_id: ${article_id}`
         });
       }
-      res.status(200).send({ article: article[0] });
+      res.status(200).send({ article });
     })
     .catch(next);
 };
@@ -38,7 +38,7 @@ const updateVotesByArticleId = (req, res, next) => {
             msg: `No article found for article_id: ${article_id}`
           });
         } else {
-          res.status(200).send({ article: article[0] });
+          res.status(200).send({ article });
         }
       })
       .catch(next);
