@@ -10,21 +10,23 @@ const {
   sendAllCommentsByArticleId
 } = require("../controllers/commentsControllers");
 
-//Get request to get all of the articles
-articlesRouter.route("/").get(sendAllArticles);
+const { handleInvalidMethods } = require("../errors/index");
 
-//Get request to get an article by its ID
-//Patch request to update the votes property of a particular article
+articlesRouter
+  .route("/")
+  .get(sendAllArticles)
+  .all(handleInvalidMethods);
+
 articlesRouter
   .route("/:article_id")
   .get(sendArticleById)
-  .patch(updateVotesByArticleId);
+  .patch(updateVotesByArticleId)
+  .all(handleInvalidMethods);
 
-//Post request to post a new comment on a given article
-//Get request to get an array of all the comments for a particular article
 articlesRouter
   .route("/:article_id/comments")
   .post(addCommentByArticleId)
-  .get(sendAllCommentsByArticleId);
+  .get(sendAllCommentsByArticleId)
+  .all(handleInvalidMethods);
 
 module.exports = articlesRouter;

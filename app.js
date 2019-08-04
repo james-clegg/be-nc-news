@@ -8,11 +8,8 @@ const {
   handleServerErrors
 } = require("./errors");
 
-// API router
 app.use(express.json())
 app.use("/api", apiRouter);
-
-// Error handlers:
 
 app.all("/*", handleNonExistentRoutes);
 app.use(handleCustomErrors);

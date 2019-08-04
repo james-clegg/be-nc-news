@@ -9,9 +9,8 @@ const connection = require("../db/connection");
 describe("/api", () => {
   after(() => connection.destroy());
   beforeEach(() => connection.seed.run());
-  describe("/topics", () => {
-    //Get request to get all topics
 
+  describe("/topics", () => {
     it("GET returns an object with a key of 'topics' and a value of an array of all the topics", () => {
       return request(app)
         .get("/api/topics")
@@ -37,15 +36,14 @@ describe("/api", () => {
         });
     });
   });
-  describe("/users/:username", () => {
-    //Get request to get a user by their username
 
+  describe("/users/:username", () => {
     it("GET should return a user object", () => {
       return request(app)
         .get("/api/users/butter_bridge")
         .expect(200)
         .then(({ body: { user } }) => {
-          expect(user[0]).to.be.an("object");
+          expect(user).to.be.an("object");
         });
     });
     it("GET should return a user object with keys of username, avatar_url, and name", () => {
@@ -53,7 +51,7 @@ describe("/api", () => {
         .get("/api/users/butter_bridge")
         .expect(200)
         .then(({ body: { user } }) => {
-          expect(user[0]).to.have.all.keys("username", "avatar_url", "name");
+          expect(user).to.have.all.keys("username", "avatar_url", "name");
         });
     });
     it("GET ERROR should return a 404 when passed a username that does not exist", () => {
@@ -65,15 +63,14 @@ describe("/api", () => {
         });
     });
   });
-  describe("/articles/:article_id", () => {
-    //Get request to get an article by its ID
 
+  describe("/articles/:article_id", () => {
     it("GET should return an article object", () => {
       return request(app)
         .get("/api/articles/1")
         .expect(200)
         .then(({ body: { article } }) => {
-          expect(article[0]).to.be.an("object");
+          expect(article).to.be.an("object");
         });
     });
     it("GET should return an article object with keys of author, title, article_id, body, topic, created_at, votes, and comment_count", () => {
@@ -81,7 +78,7 @@ describe("/api", () => {
         .get("/api/articles/1")
         .expect(200)
         .then(({ body: { article } }) => {
-          expect(article[0]).to.have.all.keys(
+          expect(article).to.have.all.keys(
             "author",
             "title",
             "article_id",
@@ -109,16 +106,13 @@ describe("/api", () => {
           expect(msg).eql("Invalid input syntax");
         });
     });
-
-    //Patch request to update the votes property of a particular article
-
     it("PATCH returns 200 and the updated article", () => {
       return request(app)
         .patch("/api/articles/1")
         .send({ inc_votes: 1 })
         .expect(200)
         .then(({ body: { article } }) => {
-          expect(article[0]).to.have.all.keys(
+          expect(article).to.have.all.keys(
             "author",
             "title",
             "article_id",
@@ -147,12 +141,21 @@ describe("/api", () => {
           expect(msg).eql("Invalid input syntax");
         });
     });
-    it("PATCH ERROR returns 400 if there is no body on the request", () => {
+    it("PATCH ERROR returns 200 and the unchanged article if there is no body on the request", () => {
       return request(app)
         .patch("/api/articles/1")
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).eql("No body on request");
+        .expect(200)
+        .then(({ body: { article } }) => {
+          expect(article).to.eql({
+            author: "butter_bridge",
+            title: "Living in the shadow of a great man",
+            article_id: 1,
+            body: "I find this existence challenging",
+            topic: "mitch",
+            created_at: "2018-11-15T12:21:54.171Z",
+            votes: 100,
+            comment_count: "13"
+          });
         });
     });
     it("PATCH ERROR returns 400 if the body on the request is in the incorrect format", () => {
@@ -174,9 +177,8 @@ describe("/api", () => {
         });
     });
   });
-  describe("/api/articles/:article_id/comments", () => {
-    //Post request to post a new comment on a given article
 
+  describe("/api/articles/:article_id/comments", () => {
     it("POST returns 201 and returns the posted comment object", () => {
       return request(app)
         .post("/api/articles/1/comments")
@@ -186,7 +188,7 @@ describe("/api", () => {
           body: "insert witty catchphrase here"
         })
         .then(({ body: { comment } }) => {
-          expect(comment[0]).to.have.all.keys(
+          expect(comment).to.have.all.keys(
             "article_id",
             "author",
             "body",
@@ -241,8 +243,6 @@ describe("/api", () => {
           expect(msg).eql("body contains unexpected keys");
         });
     });
-
-    //Get request to get an array of all the comments for a particular article
 
     it("GET returns 200 and an array of comments for the given article ID", () => {
       return request(app)
@@ -308,9 +308,8 @@ describe("/api", () => {
         });
     });
   });
-  describe("/api/articles", () => {
-    //Get request to get all of the articles
 
+  describe("/api/articles", () => {
     it("GET returns 200 and an array of article objects with the correct keys", () => {
       return request(app)
         .get("/api/articles")
@@ -334,6 +333,30 @@ describe("/api", () => {
         .expect(200)
         .then(({ body: { articles } }) => {
           expect(articles).to.be.sortedBy("votes", { descending: false });
+        });
+    });
+    it("GET returns 200 and an array of article objects sorted by a given (non-numeric) column", () => {
+      return request(app)
+        .get("/api/articles?sort_by=author")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.sortedBy("author", { descending: true });
+        });
+    });
+    it("GET returns 200 and an array of article objects sorted by created_at and in descending order when passed no queries", () => {
+      return request(app)
+        .get("/api/articles")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.sortedBy("created_at", { descending: true });
+        });
+    });
+    it("GET returns 200 and an array of article objects sorted by created_at and in ascending order when passed no sorted by query and an ascending order", () => {
+      return request(app)
+        .get("/api/articles?order=asc")
+        .expect(200)
+        .then(({ body: { articles } }) => {
+          expect(articles).to.be.sortedBy("created_at", { descending: false });
         });
     });
     it("GET returns 200 and an array of article objects filtered for a specific author", () => {
@@ -380,20 +403,20 @@ describe("/api", () => {
           expect(msg).to.eql("Order is in invalid format");
         });
     });
-    it("GET ERROR returns 400 when passed an author to filter by that returns no articles", () => {
+    it("GET ERROR returns 404 when passed an author to filter by that returns no articles", () => {
       return request(app)
         .get("/api/articles?author=fatboyslim")
-        .expect(400)
+        .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).to.eql(
             "Author is not in the database or does not have any articles associated with them"
           );
         });
     });
-    it("GET ERROR returns 400 when passed a topic to filter by that returns no articles", () => {
+    it("GET ERROR returns 404 when passed a topic to filter by that returns no articles", () => {
       return request(app)
         .get("/api/articles?topic=fatboyslim")
-        .expect(400)
+        .expect(404)
         .then(({ body: { msg } }) => {
           expect(msg).to.eql(
             "Topic is not in the database or does not have any articles associated with it"
@@ -401,16 +424,15 @@ describe("/api", () => {
         });
     });
   });
-  describe("/api/comments/:comment_id", () => {
-    //Patch request to update the votes total of a particular comment
 
+  describe("/api/comments/:comment_id", () => {
     it("PATCH should return 200 and an updated comment object with the new values", () => {
       return request(app)
         .patch("/api/comments/1")
         .send({ inc_votes: 1 })
         .expect(200)
         .then(({ body: { comment } }) => {
-          expect(comment[0]).to.have.all.keys(
+          expect(comment).to.have.all.keys(
             "comment_id",
             "author",
             "article_id",
@@ -418,7 +440,7 @@ describe("/api", () => {
             "created_at",
             "body"
           );
-          expect(comment[0].votes).to.equal(17);
+          expect(comment.votes).to.equal(17);
         });
     });
     it("PATCH ERROR returns 404 if comment_id does not exist", () => {
@@ -439,12 +461,21 @@ describe("/api", () => {
           expect(msg).to.eql("Invalid input syntax");
         });
     });
-    it("PATCH ERROR returns 400 if there is no body on the request", () => {
+    it("PATCH ERROR returns 200 and the unedited comment if there is no body on the request", () => {
       return request(app)
         .patch("/api/comments/1")
-        .expect(400)
-        .then(({ body: { msg } }) => {
-          expect(msg).to.eql("No body on request");
+        .expect(200)
+        .then(({ body: { comment } }) => {
+          expect(comment).to.eql({
+            comment_id: 1,
+            author: "butter_bridge",
+            article_id: 9,
+            votes: 16,
+            created_at: "2017-11-22T12:36:03.389Z",
+            body:
+              "Oh, I've got compassion running out of my " +
+              "nose, pal! I'm the Sultan of Sentiment!"
+          });
         });
     });
     it("PATCH ERROR returns 400 if the body on the request is in the incorrect format", () => {
@@ -465,8 +496,6 @@ describe("/api", () => {
           expect(msg).to.eql("body contains unexpected keys");
         });
     });
-
-    //Delete request removes a particular comment by its ID
 
     it("DELETE returns 204 and no content", () => {
       return request(app)

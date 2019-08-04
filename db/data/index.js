@@ -1,4 +1,3 @@
-// Gathering both test and dev data to make the relevant data easier to access
 const ENV = process.env.NODE_ENV || 'development';
 
 const devData = require("./development-data/index");
