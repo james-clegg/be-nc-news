@@ -35,6 +35,11 @@ describe("/api", () => {
           expect(msg).to.equal("route does not exist");
         });
     });
+    it("PUT ERROR returns invalid method on route", () => {
+      return request(app)
+        .put("/api/topics")
+        .expect(405);
+    });
   });
 
   describe("/users/:username", () => {
@@ -61,6 +66,11 @@ describe("/api", () => {
         .then(({ body: { msg } }) => {
           expect(msg).to.equal("No user found for username: NOT_A_USER");
         });
+    });
+    it("PUT ERROR returns invalid method on route", () => {
+      return request(app)
+        .put("/api/users/butter_bridge")
+        .expect(405);
     });
   });
 
@@ -175,6 +185,11 @@ describe("/api", () => {
         .then(({ body: { msg } }) => {
           expect(msg).eql("body contains unexpected keys");
         });
+    });
+    it("PUT ERROR returns invalid method on route", () => {
+      return request(app)
+        .put("/api/articles/1")
+        .expect(405);
     });
   });
 
@@ -307,6 +322,11 @@ describe("/api", () => {
           expect(comments).to.be.sortedBy("votes", { descending: false });
         });
     });
+    it("PUT ERROR returns invalid method on route", () => {
+      return request(app)
+        .put("/api/articles/5/comments")
+        .expect(405);
+    });
   });
 
   describe("/api/articles", () => {
@@ -423,6 +443,11 @@ describe("/api", () => {
           );
         });
     });
+    it("PUT ERROR returns invalid method on route", () => {
+      return request(app)
+        .put("/api/articles")
+        .expect(405);
+    });
   });
 
   describe("/api/comments/:comment_id", () => {
@@ -496,7 +521,6 @@ describe("/api", () => {
           expect(msg).to.eql("body contains unexpected keys");
         });
     });
-
     it("DELETE returns 204 and no content", () => {
       return request(app)
         .delete("/api/comments/1")
@@ -520,6 +544,11 @@ describe("/api", () => {
         .then(({ body: { msg } }) => {
           expect(msg).to.eql("Invalid input syntax");
         });
+    });
+    it("PUT ERROR returns invalid method on route", () => {
+      return request(app)
+        .put("/api/comments/1")
+        .expect(405);
     });
   });
 });
