@@ -9,9 +9,6 @@ const {
   handleServerErrors
 } = require("./errors");
 app.use(cors());
-app.get("/products/:id", function(req, res, next) {
-  res.json({ msg: "This is CORS-enabled for all origins!" });
-});
 
 app.use(express.json());
 app.use("/api", apiRouter);
